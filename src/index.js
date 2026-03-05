@@ -3,7 +3,11 @@ import cors from "cors"
 import userRouter from './routes/user.routes.js';
 import paymentRouter from './routes/payment.routes.js';
 import webhookRouter from './routes/webhook.routes.js';
-import fs  from 'fs';
+import fs from 'fs';
+import connectDB from './config/db.js';
+
+// Connect to MongoDB
+connectDB();
 
 
 const app = express();
@@ -18,7 +22,7 @@ app.use('/api/payment', paymentRouter);
 app.use('/api/webhook', webhookRouter)
 app.post('/api/print-payload', (req, res) => {
   //save payload in ./payload.txt file for debug
-  
+
   const payload = JSON.stringify(req.body, null, 2);
   fs.writeFile('./payload.txt', payload, (err) => {
     if (err) {

@@ -1,4 +1,4 @@
-import UserService from '../services/user.service.js';
+import UserService from '../services/mongo/user.service.js';
 
 class UserController {
   // Create new user
@@ -8,7 +8,7 @@ class UserController {
       if (!name || !phone) {
         return res.status(400).json({ error: 'Name and phone are required' });
       }
-      
+
       const user = await UserService.createUser({ name, phone });
       res.status(201).json(user);
     } catch (error) {
@@ -95,7 +95,7 @@ class UserController {
       if (!phone) {
         return res.status(400).json({ error: 'Phone number is required' });
       }
-      
+
       await UserService.sendOtp(phone);
       res.status(200).json({
         success: true
@@ -112,7 +112,7 @@ class UserController {
       if (!phone) {
         return res.status(400).json({ error: 'Phone number is required' });
       }
-      
+
       const user = await UserService.login(phone, password, deviceId);
       res.status(200).json(user);
     } catch (error) {
@@ -126,7 +126,7 @@ class UserController {
       if (!userId) {
         return res.status(400).json({ error: 'User ID is required' });
       }
-      
+
       await UserService.logout(userId);
       res.status(200).json({ message: 'User logged out successfully' });
     } catch (error) {
@@ -210,11 +210,11 @@ class UserController {
       const { phone, formId } = req.params;
       const { steps } = req.body;
 
-      
-      
+
+
       if (!phone || !formId || !steps) {
-        return res.status(400).json({ 
-          error: 'Phone number, form ID and steps data are required' 
+        return res.status(400).json({
+          error: 'Phone number, form ID and steps data are required'
         });
       }
 
@@ -227,7 +227,7 @@ class UserController {
 
   async getUserLists(req, res) {
     try {
-      const {id} = req.user
+      const { id } = req.user
       const lists = await UserService.getUserLists(id);
       res.status(200).json(lists);
     } catch (error) {
@@ -236,8 +236,8 @@ class UserController {
   }
   async getRegistrationForm(req, res) {
     try {
-      const {id} = req.user
-      
+      const { id } = req.user
+
       const form = await UserService.getRegistrationForm(id);
       res.status(200).json(form);
     } catch (error) {
@@ -245,7 +245,7 @@ class UserController {
     }
   }
   async getLandingPageData(req, res) {
-    try {      
+    try {
       const data = await UserService.getLandingPageData();
       res.status(200).json(data);
     } catch (error) {
@@ -258,7 +258,7 @@ class UserController {
       if (!name) {
         return res.status(400).json({ error: 'Name is required' });
       }
-      
+
       const user = await UserService.updateName(phone, name, email);
       res.status(200).json(user);
     } catch (error) {
@@ -272,7 +272,7 @@ class UserController {
       if (!phone || !otp) {
         return res.status(400).json({ error: 'Phone number and OTP are required' });
       }
-      
+
       const user = await UserService.verifyPhone(phone, otp);
       res.status(200).json(user);
     } catch (error) {
@@ -280,15 +280,15 @@ class UserController {
     }
   }
 
-  async sendPushNotification(req, res){
+  async sendPushNotification(req, res) {
     try {
       const { playedId } = req.params;
       const { phone, title, body } = req.body;
       if (!phone || !title || !body) {
         return res.status(400).json({ error: 'Phone number, title and body are required' });
       }
-      
-      const user = await UserService.sendPushNotification(phone,playedId, title, body);
+
+      const user = await UserService.sendPushNotification(phone, playedId, title, body);
       res.status(200).json(user);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -300,7 +300,7 @@ class UserController {
       if (!phone || !oneSignalId) {
         return res.status(400).json({ error: 'Phone number and OneSignal ID are required' });
       }
-      
+
       const user = await UserService.saveOneSignalId(phone, oneSignalId);
       res.status(200).json(user);
     } catch (error) {
@@ -309,7 +309,7 @@ class UserController {
   }
 
   async getHomePageData(req, res) {
-    try {      
+    try {
       const data = await UserService.getHomePageData();
       res.status(200).json(data);
     } catch (error) {
@@ -318,7 +318,7 @@ class UserController {
   }
 
   async getPremiumPlans(req, res) {
-    try {      
+    try {
       const data = await UserService.getPremiumPlans();
       res.status(200).json(data);
     } catch (error) {
@@ -327,7 +327,7 @@ class UserController {
   }
 
   async getContactData(req, res) {
-    try {      
+    try {
       const data = await UserService.getContactData();
       res.status(200).json(data);
     } catch (error) {
@@ -336,7 +336,7 @@ class UserController {
   }
 
   async getDynamicContent(req, res) {
-    try {      
+    try {
       const data = await UserService.getDynamicContent();
       res.status(200).json(data);
     } catch (error) {
@@ -350,7 +350,7 @@ class UserController {
       if (!phone) {
         return res.status(400).json({ error: 'Phone number is required' });
       }
-      
+
       await UserService.forgotPasswordOTP(phone);
       res.status(200).json({
         success: true
@@ -367,7 +367,7 @@ class UserController {
       if (!phone || !otp) {
         return res.status(400).json({ error: 'Phone number and OTP are required' });
       }
-      
+
       const user = await UserService.verifyForgotPasswordOTP(phone, otp);
       res.status(200).json(user);
     } catch (error) {
@@ -382,7 +382,7 @@ class UserController {
       if (!phone || !password) {
         return res.status(400).json({ error: 'Phone number and new password are required' });
       }
-      
+
       const user = await UserService.newPassword(phone, password);
       res.status(200).json(user);
     } catch (error) {
@@ -391,7 +391,7 @@ class UserController {
   }
 
   async getEnabledFeatures(req, res) {
-    try {      
+    try {
       const data = await UserService.getEnabledFeatures();
       res.status(200).json(data);
     } catch (error) {

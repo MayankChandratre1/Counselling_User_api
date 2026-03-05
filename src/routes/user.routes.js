@@ -32,7 +32,7 @@ router.use(authMiddleware);
 router.post('/logout', UserController.logout);
 
 // Cached routes
-router.get("/lists/:id", cacheMiddleware('user'), UserController.getUserLists);
+router.get("/lists/:id", UserController.getUserLists);
 router.get("/registrationForm", UserController.getRegistrationForm);
 
 

@@ -61,10 +61,10 @@ class OtpClient {
     const message = `Here is your OTP for verification on app ${otp}. Thank you for signing up on Sarathi App!!`;
     
     try {
-      // if(true) {
-      //   console.log(`Test mode: OTP is 123456`);
-      //   return '123456';
-      // }
+      if(true) {
+        console.log(`Test mode: OTP is 123456`);
+        return '123456';
+      }
       await this.sendSms(phoneNumber, message);
       return otp;
     } catch (error) {
