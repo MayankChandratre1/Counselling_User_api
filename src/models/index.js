@@ -10,7 +10,8 @@ import {
     MetadataSchema,
     PaymentLogSchema,
     UserListSchema,
-    MasterListSchema
+    MasterListSchema,
+    LandingPageReviewsSchema
 } from './SchemasV3.js';
 
 export const User = mongoose.models.User || mongoose.model('User', UserSchema, 'users');
@@ -26,3 +27,4 @@ export const Metadata = mongoose.models.Metadata || mongoose.model('Metadata', M
 export const PaymentLog = mongoose.models.PaymentLog || mongoose.model('PaymentLog', PaymentLogSchema, 'paymentlogs');
 export const UserList = mongoose.models.UserList || mongoose.model('UserList', UserListSchema, 'userlists');
 export const MasterList = mongoose.models.MasterList || mongoose.model('MasterList', MasterListSchema, 'masterlists');
+export const LandingPageReviews = mongoose.models.LandingPageReviews || mongoose.model('LandingPageReviews', LandingPageReviewsSchema, 'landingpagereviews');

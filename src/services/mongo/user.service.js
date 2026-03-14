@@ -1,4 +1,4 @@
-import { User, CounsellingForm, RegistrationForm, LandingPageContact, LandingPageHomepage, LandingPagePremiumPlans, DynamicScreen, Metadata, UserList } from '../../models/index.js';
+import { User, CounsellingForm, RegistrationForm, LandingPageContact, LandingPageHomepage, LandingPagePremiumPlans, DynamicScreen, Metadata, UserList, LandingPageReviews } from '../../models/index.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import redis from '../../config/redisClient.js';
@@ -470,13 +470,13 @@ class UserService {
 
     async getUserLists(id) {
         try {
-            
+
             const user = await User.findOne({ id });
-            
+
             if (!user) throw new Error('User not found');
             const userlists = await UserList.find({ userId: user.id });
             console.log(userlists.length);
-            
+
             return userlists ?? [];
         } catch (error) {
             throw new Error(`Error getting user lists: ${error.message}`);
@@ -720,6 +720,16 @@ class UserService {
             return formDoc.toObject() ?? {};
         } catch (error) {
             throw new Error(`Error getting enabled features: ${error.message}`);
+        }
+    }
+
+    async getReviews() {
+        try {
+            const formDoc = await LandingPageReviews.findOne({ id: 'reviews' });
+            if (!formDoc) throw new Error('Reviews not found');
+            return formDoc.toObject() ?? {};
+        } catch (error) {
+            throw new Error(`Error getting reviews: ${error.message}`);
         }
     }
 

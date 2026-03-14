@@ -399,6 +399,15 @@ class UserController {
     }
   }
 
+  async getReviews(req, res) {
+    try {
+      const data = await UserService.getReviews();
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
 }
 
 export default new UserController();

@@ -8,7 +8,7 @@ class OtpClient {
     this.apiUrl = 'https://www.bulksmsplans.com/api/send_sms';
     this.apiId = process.env.SMS_API_ID;
     this.apiPassword = process.env.SMS_API_PASSWORD;
-    this.senderId = process.env.SMS_SENDER_ID || 'HDTSMS';
+    this.senderId = process.env.SMS_SENDER_ID || 'YASHLC';
     this.templateId = process.env.SMS_TEMPLATE_ID || '176983';
   }
 
@@ -39,7 +39,7 @@ class OtpClient {
       };
 
       const response = await axios.get(this.apiUrl, { params });
-      
+
       console.log(`SMS sent to ${cleanPhoneNumber}: ${message}`);
       return response.data;
     } catch (error) {
@@ -56,10 +56,10 @@ class OtpClient {
   async sendOtp(phoneNumber) {
     // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    
+
     // Create message with OTP
-    const message = `Here is your OTP for verification on app ${otp}. Thank you for signing up on Sarathi App!!`;
-    
+    const message = `Dear user, your OTP for login to Yash Classes is ${otp}. Please do not share this OTP with anyone. This OTP is valid for 10 minutes. - Yash Classes`;
+
     try {
       if(true) {
         console.log(`Test mode: OTP is 123456`);
