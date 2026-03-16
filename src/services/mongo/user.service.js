@@ -269,11 +269,9 @@ class UserService {
                 return { isPremium: false };
             }
 
-            if (!user.premiumPlan) return {
+            if (!user.premiumPlan || !user.premiumPlan.expiryDate) return {
                 isPremium: false
             };
-
-            console.log(user.premiumPlan);
 
             const now = new Date();
             const expiryDate = new Date(user.premiumPlan.expiryDate);
