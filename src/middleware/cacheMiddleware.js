@@ -2,10 +2,13 @@ import redis from '../config/redisClient.js';
 
 const cacheMiddleware = (keyPrefix, expireTime = 3600) => {
     return async (req, res, next) => {
+        if (!redis) {
+            return next();
+        }
+
         try {
             const key = `${keyPrefix}:${req.originalUrl}`;
             const cachedData = await redis.get(key);
-            console.log('cachedData found for:', req.originalUrl);
             
             if (cachedData) {
                 return res.json(JSON.parse(cachedData));

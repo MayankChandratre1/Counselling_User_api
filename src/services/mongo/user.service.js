@@ -535,6 +535,10 @@ class UserService {
     }
 
     async invalidateCache(pattern) {
+        if (!redis) {
+            return;
+        }
+
         const keys = await redis.keys(pattern);
         if (keys.length > 0) {
             await redis.del(keys);

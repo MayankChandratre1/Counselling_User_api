@@ -3,14 +3,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const redis = process.env.REDIS_URL ? new Redis(process.env.REDIS_URL) :new Redis({
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: process.env.REDIS_PORT || 6379,
-  password: process.env.REDIS_PASSWORD || ''
-});
+const isRedisEnabled = Boolean(process.env.REDIS_URL);
 
-redis.on('error', (err) => {
-  console.error('Redis error:', err);
-});
+const redis = isRedisEnabled ? new Redis(process.env.REDIS_URL) : null;
 
+if (redis) {
+  redis.on('error', (err) => {
+    console.error('Redis error:', err);
+  });
+}
+
+export { isRedisEnabled };
 export default redis;
