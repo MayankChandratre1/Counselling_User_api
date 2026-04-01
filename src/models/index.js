@@ -22,7 +22,7 @@ export const LandingPageContact = mongoose.models.LandingPageContact || mongoose
 export const LandingPageHomepage = mongoose.models.LandingPageHomepage || mongoose.model('LandingPageHomepage', LandingPageHomepageSchema, 'landingpagehomepages');
 export const LandingPagePremiumPlans = mongoose.models.LandingPagePremiumPlans || mongoose.model('LandingPagePremiumPlans', LandingPagePremiumPlansSchema, 'landingpagepremiumplans');
 
-export const DynamicScreen = mongoose.models.DynamicScreen || mongoose.model('DynamicScreen', DynamicScreenSchema, 'dynamicscreens');
+export const DynamicScreen = mongoose.models.DynamicScreen || mongoose.model('DynamicScreen', DynamicScreenSchema, 'dynamicScreens');
 export const Metadata = mongoose.models.Metadata || mongoose.model('Metadata', MetadataSchema, 'metadata');
 export const PaymentLog = mongoose.models.PaymentLog || mongoose.model('PaymentLog', PaymentLogSchema, 'paymentlogs');
 export const UserList = mongoose.models.UserList || mongoose.model('UserList', UserListSchema, 'userlists');
