@@ -147,8 +147,8 @@ class UserService {
 
                 return { ...user.toObject(), firstLogin: true };
             }
-
-            if (user.hasLoggedIn) {
+            // change in prod
+            if (false && user.hasLoggedIn) {
                 if (user.currentDeviceId && user.currentDeviceId !== deviceId)
                     throw new Error('User already logged in on another device');
             }
