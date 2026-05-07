@@ -3,6 +3,12 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+function isOtpTestEnabled() {
+  const v = process.env.OTP_TEST;
+  if (v == null || String(v).trim() === '') return false;
+  return ['1', 'true', 'yes', 'on'].includes(String(v).trim().toLowerCase());
+}
+
 class OtpClient {
   constructor() {
     this.apiUrl = 'https://www.bulksmsplans.com/api/send_sms';
@@ -61,9 +67,10 @@ class OtpClient {
     const message = `Dear user, your OTP for login to Yash Classes is ${otp}. Please do not share this OTP with anyone. This OTP is valid for 10 minutes. - Yash Classes`;
 
     try {
-      //change in prod
-      if(true) {
-        console.log(`Test mode: OTP is 123456`);
+      if (isOtpTestEnabled()) {
+        console.warn(
+          '[OTP_TEST] SMS not sent; fixed test OTP is used. Set OTP_TEST=0 (or unset) in production.'
+        );
         return '123456';
       }
       await this.sendSms(phoneNumber, message);
