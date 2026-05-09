@@ -20,6 +20,7 @@ router.get("/getenabledfeatures",cacheMiddleware('enabled'), UserController.getE
 router.get("/getcontact",cacheMiddleware('contact'), UserController.getContactData);
 router.get("/getdynamiccontent",cacheMiddleware('dynamic'), UserController.getDynamicContent);
 router.get("/getreviews",cacheMiddleware('reviews'), UserController.getReviews);    
+router.get("/feature-flags", UserController.getFeatureFlags);
 
 //Forgot password
 router.get('/forgot-pass-otp/:phone', UserController.forgotPasswordOTP);

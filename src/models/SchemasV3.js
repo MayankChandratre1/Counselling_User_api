@@ -709,3 +709,17 @@ export const MetadataSchema = new Schema({
     enabled: { type: [String], default: [] },
     total: { type: [String], default: [] }
 }, { strict: false, timestamps: true });
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 19. FeatureFlag Schema
+//   Admin-toggleable runtime feature switches. Read-only from the mobile app.
+//   Stored in the same `featureflags` collection that Counselling-admin writes.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const FeatureFlagSchema = new Schema({
+    key: { type: String, unique: true, index: true, required: true },
+    enabled: { type: Boolean, default: false },
+    description: { type: String, default: '' },
+    updatedBy: { type: String }
+}, { timestamps: true });

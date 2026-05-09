@@ -1,4 +1,4 @@
-import { User, CounsellingForm, RegistrationForm, LandingPageContact, LandingPageHomepage, LandingPagePremiumPlans, DynamicScreen, Metadata, UserList, LandingPageReviews } from '../../models/index.js';
+import { User, CounsellingForm, RegistrationForm, LandingPageContact, LandingPageHomepage, LandingPagePremiumPlans, DynamicScreen, Metadata, UserList, LandingPageReviews, FeatureFlag, SUPPORTED_FLAG_KEYS } from '../../models/index.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import redis from '../../config/redisClient.js';
@@ -732,6 +732,24 @@ class UserService {
             return formDoc.toObject() ?? {};
         } catch (error) {
             throw new Error(`Error getting reviews: ${error.message}`);
+        }
+    }
+
+    async getFeatureFlags() {
+        try {
+            const docs = await FeatureFlag.find({ key: { $in: SUPPORTED_FLAG_KEYS } }).lean();
+            const map = {};
+            for (const key of SUPPORTED_FLAG_KEYS) {
+                map[key] = false;
+            }
+            for (const doc of docs) {
+                if (SUPPORTED_FLAG_KEYS.includes(doc.key)) {
+                    map[doc.key] = !!doc.enabled;
+                }
+            }
+            return { flags: map };
+        } catch (error) {
+            throw new Error(`Error getting feature flags: ${error.message}`);
         }
     }
 

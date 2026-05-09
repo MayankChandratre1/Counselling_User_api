@@ -11,7 +11,8 @@ import {
     PaymentLogSchema,
     UserListSchema,
     MasterListSchema,
-    LandingPageReviewsSchema
+    LandingPageReviewsSchema,
+    FeatureFlagSchema
 } from './SchemasV3.js';
 
 export const User = mongoose.models.User || mongoose.model('User', UserSchema, 'users');
@@ -28,3 +29,11 @@ export const PaymentLog = mongoose.models.PaymentLog || mongoose.model('PaymentL
 export const UserList = mongoose.models.UserList || mongoose.model('UserList', UserListSchema, 'userlists');
 export const MasterList = mongoose.models.MasterList || mongoose.model('MasterList', MasterListSchema, 'masterlists');
 export const LandingPageReviews = mongoose.models.LandingPageReviews || mongoose.model('LandingPageReviews', LandingPageReviewsSchema, 'landingpagereviews');
+export const FeatureFlag = mongoose.models.FeatureFlag || mongoose.model('FeatureFlag', FeatureFlagSchema, 'featureflags');
+
+// Canonical list of feature flag keys the mobile app understands. Used so the
+// public endpoint always returns a deterministic shape even before an admin
+// has toggled anything.
+export const SUPPORTED_FLAG_KEYS = [
+    'college_range_enabled'
+];
