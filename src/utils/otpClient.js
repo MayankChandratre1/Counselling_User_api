@@ -9,6 +9,35 @@ function isOtpTestEnabled() {
   return ['1', 'true', 'yes', 'on'].includes(String(v).trim().toLowerCase());
 }
 
+/** Reduce any phone string to the last 10 digits so 10-digit, 12-digit
+ *  (with `91`) and `+91 ...` formats compare equal. */
+function normalizePhone(p) {
+  return String(p || '').replace(/\D/g, '').slice(-10);
+}
+
+/**
+ * Phone-level test allowlist. Set `OTP_TEST_NUMBERS` in `.env` to a comma
+ * separated list of phones (any common format works) that should always
+ * receive the fixed `123456` OTP without hitting the SMS gateway.
+ *   e.g. OTP_TEST_NUMBERS=9876543210, +91 9123456789, 919000000001
+ */
+function getTestNumbers() {
+  const v = process.env.OTP_TEST_NUMBERS;
+  if (!v) return new Set();
+  return new Set(
+    String(v)
+      .split(',')
+      .map((s) => normalizePhone(s))
+      .filter(Boolean)
+  );
+}
+
+function isTestNumber(phoneNumber) {
+  const normalized = normalizePhone(phoneNumber);
+  if (!normalized) return false;
+  return getTestNumbers().has(normalized);
+}
+
 class OtpClient {
   constructor() {
     this.apiUrl = 'https://www.bulksmsplans.com/api/send_sms';
@@ -69,7 +98,13 @@ class OtpClient {
     try {
       if (isOtpTestEnabled()) {
         console.warn(
-          '[OTP_TEST] SMS not sent; fixed test OTP is used. Set OTP_TEST=0 (or unset) in production.'
+          '[OTP_TEST] global switch on; SMS skipped, returning fixed 123456 for every number.'
+        );
+        return '123456';
+      }
+      if (isTestNumber(phoneNumber)) {
+        console.warn(
+          `[OTP_TEST_NUMBERS] ${phoneNumber} is whitelisted; SMS skipped, returning fixed 123456.`
         );
         return '123456';
       }
