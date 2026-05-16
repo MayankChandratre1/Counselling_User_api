@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { User, PaymentLog } from '../../models/index.js';
 
 class WebhookService {
@@ -35,7 +36,10 @@ class WebhookService {
                 const premiumOrder = user.orders.find(o => o.orderId === orderId);
                 const planDetails = JSON.parse(premiumOrder.notes?.planDetails ?? '{}');
 
-                if (planDetails) {
+                // Frontend-only ₹5 test plan: record payment, do not grant premium
+                if (planDetails?.isTestPlan) {
+                    console.log('Test payment captured — skipping premium upgrade for order', orderId);
+                } else if (planDetails) {
                     const premiumPlan = {
                         planTitle: planDetails.plan ?? "Counselling",
                         purchasedDate: new Date(),
@@ -131,12 +135,23 @@ class WebhookService {
 
     async logPaymentEvent(eventType, data) {
         try {
+            const sourceId = data?.id || data?.order_id;
+            const id = sourceId
+                ? `plog_${sourceId}_${eventType}`
+                : `plog_${crypto.randomUUID()}`;
+
             await PaymentLog.create({
+                id,
                 eventType,
                 data,
-                timestamp: new Date()
+                timestamp: new Date(),
             });
         } catch (error) {
+            // Razorpay may retry the same webhook — treat duplicate log id as OK
+            if (error?.code === 11000) {
+                console.warn('Payment log already recorded, skipping duplicate:', eventType);
+                return;
+            }
             console.error('Error logging payment event:', error);
         }
     }
