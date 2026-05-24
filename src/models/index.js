@@ -12,7 +12,10 @@ import {
     UserListSchema,
     MasterListSchema,
     LandingPageReviewsSchema,
-    FeatureFlagSchema
+    FeatureFlagSchema,
+    NotificationSchema,
+    UserNotificationSchema,
+    AppointmentSchema
 } from './SchemasV3.js';
 
 export const User = mongoose.models.User || mongoose.model('User', UserSchema, 'users');
@@ -30,6 +33,9 @@ export const UserList = mongoose.models.UserList || mongoose.model('UserList', U
 export const MasterList = mongoose.models.MasterList || mongoose.model('MasterList', MasterListSchema, 'masterlists');
 export const LandingPageReviews = mongoose.models.LandingPageReviews || mongoose.model('LandingPageReviews', LandingPageReviewsSchema, 'landingpagereviews');
 export const FeatureFlag = mongoose.models.FeatureFlag || mongoose.model('FeatureFlag', FeatureFlagSchema, 'featureflags');
+export const Notification = mongoose.models.Notification || mongoose.model('Notification', NotificationSchema, 'notifications');
+export const UserNotification = mongoose.models.UserNotification || mongoose.model('UserNotification', UserNotificationSchema, 'usernotifications');
+export const Appointment = mongoose.models.Appointment || mongoose.model('Appointment', AppointmentSchema, 'appointments');
 
 // Canonical list of feature flag keys the mobile app understands. Used so the
 // public endpoint always returns a deterministic shape even before an admin

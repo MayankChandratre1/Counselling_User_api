@@ -1,5 +1,6 @@
 import express from 'express';
 import UserController from '../controllers/user.controller.js';
+import NotificationController from '../controllers/notification.controller.js';
 import authMiddleware from '../middleware/auth.js';
 import cacheMiddleware from '../middleware/cacheMiddleware.js';
 
@@ -32,6 +33,21 @@ router.post('/new-password/:phone', UserController.newPassword);
 router.post('/sendpushnotification/:playedId', UserController.sendPushNotification);
 router.use(authMiddleware);
 router.post('/logout', UserController.logout);
+router.post('/book-appointment', UserController.bookAppointment);
+
+// User notification inbox
+router.get('/notification-inbox', NotificationController.getNotifications);
+router.patch('/notification-inbox/read-all', NotificationController.markAllAsRead);
+router.get('/notification-inbox/by-notification/:notificationId', NotificationController.getNotificationByBroadcastId);
+router.get('/notification-inbox/:id', NotificationController.getNotificationById);
+router.patch('/notification-inbox/:id/read', NotificationController.markAsRead);
+router.get('/get-updates/:plan', NotificationController.getPlanUpdates);
+router.patch('/get-updates/:plan/read-all', NotificationController.markPlanUpdatesAsRead);
+router.get('/notifications', NotificationController.getNotifications);
+router.patch('/notifications/read-all', NotificationController.markAllAsRead);
+router.get('/notifications/by-notification/:notificationId', NotificationController.getNotificationByBroadcastId);
+router.get('/notifications/:id', NotificationController.getNotificationById);
+router.patch('/notifications/:id/read', NotificationController.markAsRead);
 
 // Cached routes
 router.get("/lists/:id", UserController.getUserLists);

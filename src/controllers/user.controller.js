@@ -134,6 +134,23 @@ class UserController {
     }
   }
 
+  async bookAppointment(req, res) {
+    try {
+      const { name, phone, reason } = req.body;
+      if (!name || !phone || !reason) {
+        return res.status(400).json({ error: 'Name, phone and reason are required' });
+      }
+
+      const result = await UserService.bookAppointment({ name, phone, reason }, req.user);
+      res.status(201).json({
+        message: 'Appointment booked successfully',
+        ...result
+      });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
   async setUserFormData(req, res) {
     try {
       const { phone, formSteps } = req.body;

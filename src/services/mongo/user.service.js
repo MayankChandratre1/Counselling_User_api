@@ -1,15 +1,128 @@
-import { User, CounsellingForm, RegistrationForm, LandingPageContact, LandingPageHomepage, LandingPagePremiumPlans, DynamicScreen, Metadata, UserList, LandingPageReviews, FeatureFlag, SUPPORTED_FLAG_KEYS } from '../../models/index.js';
+import { User, CounsellingForm, RegistrationForm, LandingPageContact, LandingPageHomepage, LandingPagePremiumPlans, DynamicScreen, Metadata, UserList, LandingPageReviews, FeatureFlag, SUPPORTED_FLAG_KEYS, Appointment } from '../../models/index.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import redis from '../../config/redisClient.js';
 import otpClient from '../../utils/otpClient.js';
 import axios from 'axios';
 import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 
 class UserService {
     // Helper to generate IDs
     generateId() {
         return crypto.randomUUID().replace(/-/g, '').substring(0, 20);
+    }
+
+    generateAppointmentId() {
+        return `appt_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
+    }
+
+    escapeHtml(value) {
+        return value
+            ?.toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;') || '';
+    }
+
+    async sendAppointmentEmail(appointment) {
+        const receiver = process.env.APPOINTMENT_RECEIVER_EMAIL || process.env.APPOINTMENT_EMAIL_TO;
+        const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+        const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+
+        if (!receiver || !smtpUser || !smtpPass) {
+            return {
+                sent: false,
+                error: 'Appointment email config missing. Set APPOINTMENT_RECEIVER_EMAIL, SMTP_USER, and SMTP_PASS.'
+            };
+        }
+
+        const port = Number(process.env.SMTP_PORT || 587);
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port,
+            secure: process.env.SMTP_SECURE === 'true' || port === 465,
+            auth: {
+                user: smtpUser,
+                pass: smtpPass
+            }
+        });
+
+        const safeName = this.escapeHtml(appointment.name);
+        const safePhone = this.escapeHtml(appointment.phone);
+        const safeReason = this.escapeHtml(appointment.reason || 'Not provided');
+        const createdAt = new Date(appointment.createdAt || Date.now()).toLocaleString('en-IN');
+        await transporter.sendMail({
+            from: process.env.SMTP_FROM || smtpUser,
+            to: receiver,
+            subject: `New appointment request - ${appointment.name}`,
+            text: [
+                'A new appointment request has been booked.',
+                '',
+                `Appointment ID: ${appointment.id}`,
+                `Name: ${appointment.name}`,
+                `Phone: ${appointment.phone}`,
+                `Reason: ${appointment.reason || 'Not provided'}`,
+                `Created At: ${createdAt}`
+            ].join('\n'),
+            html: `
+                <h2>New Appointment Request</h2>
+                <p>A new appointment request has been booked from the mobile app.</p>
+                <table cellpadding="6" cellspacing="0" border="1">
+                    <tr><td><strong>Appointment ID</strong></td><td>${this.escapeHtml(appointment.id)}</td></tr>
+                    <tr><td><strong>Name</strong></td><td>${safeName}</td></tr>
+                    <tr><td><strong>Phone</strong></td><td>${safePhone}</td></tr>
+                    <tr><td><strong>Reason</strong></td><td>${safeReason}</td></tr>
+                    <tr><td><strong>Created At</strong></td><td>${this.escapeHtml(createdAt)}</td></tr>
+                </table>
+            `
+        });
+
+        return { sent: true };
+    }
+
+    async bookAppointment(appointmentData, authUser = null) {
+        try {
+            const name = appointmentData.name?.toString().trim();
+            const phone = appointmentData.phone?.toString().trim();
+            const reason = appointmentData.reason?.toString().trim();
+
+            if (!name || !phone || !reason) {
+                throw new Error('Name, phone and reason are required');
+            }
+
+            if (authUser?.phone && authUser.phone.toString() !== phone) {
+                throw new Error('Cannot book appointment for another phone number');
+            }
+
+            const appointment = new Appointment({
+                id: this.generateAppointmentId(),
+                name,
+                phone,
+                reason,
+                status: ''
+            });
+
+            await appointment.save();
+
+            let emailResult;
+            try {
+                emailResult = await this.sendAppointmentEmail(appointment.toObject());
+            } catch (error) {
+                console.error('Error sending appointment email:', error.message);
+                emailResult = { sent: false, error: error.message };
+            }
+
+            return {
+                appointment: appointment.toObject(),
+                emailSent: emailResult.sent,
+                ...(emailResult.error ? { emailError: emailResult.error } : {})
+            };
+        } catch (error) {
+            throw new Error(`Error booking appointment: ${error.message}`);
+        }
     }
 
     async sendOneSignalNotification(playerId, title, message, additionalData = {}) {
