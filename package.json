@@ -28,5 +28,8 @@
   },
   "devDependencies": {
     "serverless": "^3.33.0"
+  },
+  "optionalDependencies": {
+    "gcp-metadata": "^7.0.1"
   }
 }
