@@ -1,4 +1,4 @@
-import { User, CounsellingForm, RegistrationForm, LandingPageContact, LandingPageHomepage, LandingPagePremiumPlans, DynamicScreen, Metadata, UserList, LandingPageReviews, FeatureFlag, SUPPORTED_FLAG_KEYS, Appointment } from '../../models/index.js';
+import { User, CounsellingForm, RegistrationForm, LandingPageContact, LandingPageHomepage, LandingPagePremiumPlans, DynamicScreen, Metadata, UserList, LandingPageReviews, FeatureFlag, SUPPORTED_FLAG_KEYS, SUPPORTED_FLAG_DEFAULTS, Appointment } from '../../models/index.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import redis from '../../config/redisClient.js';
@@ -853,7 +853,7 @@ class UserService {
             const docs = await FeatureFlag.find({ key: { $in: SUPPORTED_FLAG_KEYS } }).lean();
             const map = {};
             for (const key of SUPPORTED_FLAG_KEYS) {
-                map[key] = false;
+                map[key] = SUPPORTED_FLAG_DEFAULTS[key] ?? false;
             }
             for (const doc of docs) {
                 if (SUPPORTED_FLAG_KEYS.includes(doc.key)) {

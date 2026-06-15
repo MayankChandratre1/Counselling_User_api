@@ -41,5 +41,12 @@ export const Appointment = mongoose.models.Appointment || mongoose.model('Appoin
 // public endpoint always returns a deterministic shape even before an admin
 // has toggled anything.
 export const SUPPORTED_FLAG_KEYS = [
-    'college_range_enabled'
+    'college_range_enabled',
+    'home_countdown_cards_enabled',
 ];
+
+/** Default when no DB record exists yet (opt-out vs opt-in per flag). */
+export const SUPPORTED_FLAG_DEFAULTS = {
+    college_range_enabled: false,
+    home_countdown_cards_enabled: true,
+};
