@@ -246,7 +246,10 @@ export const UserSchema = new Schema({
         expiryDate: Date,
         planTitle: String,
         isPaymentPending: Boolean,
+        amountPaid: Number,
         amountRemaining: Number,
+        paymentSource: { type: String, default: 'App' },
+        paymentSourceLabel: String,
         price: Number,
         validity: Date,
         plan: String
@@ -463,7 +466,8 @@ export const PremiumPlanItemSchema = new Schema({
 
 export const LandingPagePremiumPlansSchema = new Schema({
     id: { type: String, unique: true, index: true, default: 'premiumPlans' },
-    plans: { type: [PremiumPlanItemSchema], default: [] }
+    plans: { type: [PremiumPlanItemSchema], default: [] },
+    homeCountdownCardsEnabled: { type: Boolean, default: true }
 }, { timestamps: true });
 
 // 6d. LandingPage: Reviews  (id: "reviews")

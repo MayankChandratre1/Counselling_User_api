@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { User, PaymentLog } from '../../models/index.js';
+import { DEFAULT_PAYMENT_SOURCE } from '../../constants/paymentSource.js';
 
 class WebhookService {
     async handlePaymentCaptured(payment) {
@@ -45,6 +46,7 @@ class WebhookService {
                         purchasedDate: new Date(),
                         form: planDetails.form ?? "Sarathi-Online",
                         expiryDate: new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000), // ~6 months
+                        paymentSource: DEFAULT_PAYMENT_SOURCE,
                     };
 
                     user.isPremium = true;
