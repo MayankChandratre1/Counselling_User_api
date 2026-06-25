@@ -12,8 +12,11 @@ class WebhookService {
             // Log payment event
             await this.logPaymentEvent('payment.captured', payment);
 
-            // Find user with this order
-            const user = await User.findOne({ currentOrderId: orderId });
+            // Find user with this order (prefer orders[] — currentOrderId may point at a newer attempt)
+            let user = await User.findOne({ 'orders.orderId': orderId });
+            if (!user) {
+                user = await User.findOne({ currentOrderId: orderId });
+            }
 
             if (!user) {
                 throw new Error(`No user found with order ${orderId}`);
@@ -35,14 +38,19 @@ class WebhookService {
 
             if (isPremiumPayment) {
                 const premiumOrder = user.orders.find(o => o.orderId === orderId);
-                const planDetails = JSON.parse(premiumOrder.notes?.planDetails ?? '{}');
+                let planDetails = {};
+                try {
+                    planDetails = JSON.parse(premiumOrder.notes?.planDetails ?? '{}');
+                } catch {
+                    console.warn('Invalid planDetails JSON for order', orderId);
+                }
 
                 // Frontend-only ₹5 test plan: record payment, do not grant premium
                 if (planDetails?.isTestPlan) {
                     console.log('Test payment captured — skipping premium upgrade for order', orderId);
-                } else if (planDetails) {
+                } else if (planDetails.plan || planDetails.form || premiumOrder.notes?.planTitle) {
                     const premiumPlan = {
-                        planTitle: planDetails.plan ?? "Counselling",
+                        planTitle: planDetails.plan ?? premiumOrder.notes?.planTitle ?? "Counselling",
                         purchasedDate: new Date(),
                         form: planDetails.form ?? "Sarathi-Online",
                         expiryDate: new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000), // ~6 months
@@ -72,7 +80,8 @@ class WebhookService {
             await this.logPaymentEvent('payment.failed', payment);
 
             // Find user with this order
-            const user = await User.findOne({ currentOrderId: orderId });
+            const user = await User.findOne({ 'orders.orderId': orderId })
+                || await User.findOne({ currentOrderId: orderId });
 
             if (user) {
                 // Update the specific order in user's array

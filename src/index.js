@@ -9,8 +9,8 @@ import webhookRouter from './routes/webhook.routes.js';
 import fs from 'fs';
 import connectDB from './config/db.js';
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB (await so pool is ready before accepting traffic)
+await connectDB();
 
 
 const app = express();
